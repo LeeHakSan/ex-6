@@ -1,0 +1,98 @@
+{
+  "$schema_doc": "T06 계획·실행·회고 관리 앱 — 최종 데이터베이스 스키마 문서",
+  "database": "Supabase (Postgres)",
+  "date_rules": {
+    "storage": "모든 시각 컬럼은 timestamptz로 UTC 기준 저장한다.",
+    "display": "화면 표시는 브라우저의 Date.toLocaleString('ko-KR')을 사용해 로컬 시간대로 변환해 보여준다.",
+    "date_only_fields": "plans.period_start / plans.period_end는 시간 없이 date 타입으로 저장한다.",
+    "duration_unit": "모든 소요 시간(estimated_minutes, actual_minutes)은 분(minute) 단위 정수로 저장/표시를 통일한다.",
+    "delayed_rule": "todos.status != 'completed' AND todos.deadline < now() 인 경우에만 지연으로 집계한다. 완료된 할 일은 지연으로 이중 집계하지 않는다."
+  },
+  "tables": [
+    {
+      "name": "plans",
+      "description": "사용자가 세운 계획. 수정해도 이 행의 id는 그대로 유지되고 이전 값은 plan_revisions에 스냅샷으로 남는다.",
+      "columns": [
+        { "name": "id", "type": "uuid", "constraints": "primary key, default gen_random_uuid()" },
+        { "name": "title", "type": "text", "constraints": "not null" },
+        { "name": "period_start", "type": "date", "constraints": "not null" },
+        { "name": "period_end", "type": "date", "constraints": "not null" },
+        { "name": "priority", "type": "text", "constraints": "not null, check in ('low','medium','high')" },
+        { "name": "success_criteria", "type": "text", "constraints": "not null" },
+        { "name": "estimated_minutes", "type": "integer", "constraints": "not null, default 0" },
+        { "name": "carried_over_note", "type": "text", "constraints": "nullable — 이전 계획의 retro_note가 생성 시 기본값으로 채워짐" },
+        { "name": "retro_note", "type": "text", "constraints": "nullable — 이 계획의 돌아보기에서 정한 고칠 점 한 줄" },
+        { "name": "created_at", "type": "timestamptz", "constraints": "not null, default now()" },
+        { "name": "updated_at", "type": "timestamptz", "constraints": "not null, default now()" }
+      ]
+    },
+    {
+      "name": "plan_revisions",
+      "description": "plans를 수정하기 직전의 전체 값 스냅샷. 계획을 몇 번 고쳐도 최초 작성 시점부터의 이력이 여기 쌓인다.",
+      "columns": [
+        { "name": "id", "type": "uuid", "constraints": "primary key, default gen_random_uuid()" },
+        { "name": "plan_id", "type": "uuid", "constraints": "not null, references plans(id) on delete cascade" },
+        { "name": "title", "type": "text" },
+        { "name": "period_start", "type": "date" },
+        { "name": "period_end", "type": "date" },
+        { "name": "priority", "type": "text" },
+        { "name": "success_criteria", "type": "text" },
+        { "name": "estimated_minutes", "type": "integer" },
+        { "name": "carried_over_note", "type": "text" },
+        { "name": "retro_note", "type": "text" },
+        { "name": "revised_at", "type": "timestamptz", "constraints": "not null, default now() — 스냅샷이 저장된 시각(= 수정 직전 시점)" }
+      ]
+    },
+    {
+      "name": "todos",
+      "description": "계획에 딸린 할 일. deleted_at이 not null이면 화면·집계에서 제외되는 소프트 삭제 상태.",
+      "columns": [
+        { "name": "id", "type": "uuid", "constraints": "primary key, default gen_random_uuid()" },
+        { "name": "plan_id", "type": "uuid", "constraints": "not null, references plans(id) on delete cascade" },
+        { "name": "title", "type": "text", "constraints": "not null" },
+        { "name": "description", "type": "text", "constraints": "nullable" },
+        { "name": "deadline", "type": "timestamptz", "constraints": "nullable" },
+        { "name": "priority", "type": "text", "constraints": "nullable, check in ('low','medium','high')" },
+        { "name": "tags", "type": "text[]", "constraints": "not null, default '{}'" },
+        { "name": "estimated_minutes", "type": "integer", "constraints": "not null, default 0" },
+        { "name": "status", "type": "text", "constraints": "not null, default 'in_progress', check in ('in_progress','completed')" },
+        { "name": "completed_at", "type": "timestamptz", "constraints": "nullable — 완료 처리 시각. 완료 처리는 status='in_progress'일 때만 반영되는 조건부 UPDATE로 멱등 처리." },
+        { "name": "deleted_at", "type": "timestamptz", "constraints": "nullable — 소프트 삭제 시각" },
+        { "name": "created_at", "type": "timestamptz", "constraints": "not null, default now()" },
+        { "name": "updated_at", "type": "timestamptz", "constraints": "not null, default now()" }
+      ]
+    },
+    {
+      "name": "execution_logs",
+      "description": "실제로 한 일 기록. 계획(plans)이나 할 일(todos)의 예상치를 절대 덮어쓰지 않고, 이 테이블에만 별도로 쌓인다.",
+      "columns": [
+        { "name": "id", "type": "uuid", "constraints": "primary key, default gen_random_uuid()" },
+        { "name": "todo_id", "type": "uuid", "constraints": "not null, references todos(id) on delete cascade" },
+        { "name": "started_at", "type": "timestamptz", "constraints": "not null" },
+        { "name": "ended_at", "type": "timestamptz", "constraints": "not null" },
+        { "name": "actual_minutes", "type": "integer", "constraints": "not null — round((ended_at - started_at) / 60초)로 클라이언트에서 계산해 저장" },
+        { "name": "blocked_reason", "type": "text", "constraints": "nullable" },
+        { "name": "created_at", "type": "timestamptz", "constraints": "not null, default now()" }
+      ]
+    }
+  ],
+  "relations": [
+    { "from": "plan_revisions.plan_id", "to": "plans.id", "type": "many-to-one", "on_delete": "cascade" },
+    { "from": "todos.plan_id", "to": "plans.id", "type": "many-to-one", "on_delete": "cascade" },
+    { "from": "execution_logs.todo_id", "to": "todos.id", "type": "many-to-one", "on_delete": "cascade" }
+  ],
+  "derived_metrics": {
+    "review.planned_count": "count(todos where plan_id = :plan and deleted_at is null)",
+    "review.completed_count": "count(todos where plan_id = :plan and deleted_at is null and status = 'completed')",
+    "review.delayed_count": "count(todos where plan_id = :plan and deleted_at is null and status != 'completed' and deadline < now())",
+    "review.blocked_count": "count(distinct todos.id where exists execution_logs with blocked_reason is not null for that todo)",
+    "review.estimated_total_minutes": "sum(todos.estimated_minutes) for target todos",
+    "review.actual_total_minutes": "sum(execution_logs.actual_minutes) for execution_logs belonging to target todos",
+    "review.diff_minutes": "actual_total_minutes - estimated_total_minutes (없으면 0)"
+  },
+  "access_control": {
+    "auth": "없음 (로그인 없는 공개 앱)",
+    "rls": "4개 테이블 모두 RLS 활성화, anon 역할에 select/insert/update/delete 전체 허용 정책 부여",
+    "keys_in_frontend": "Supabase anon(public) key만 사용. service_role key는 프론트엔드 코드/배포 파일 어디에도 포함하지 않는다."
+  }
+}

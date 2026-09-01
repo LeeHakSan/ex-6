@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>계획·실행·돌아보기</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="public-banner">지금은 로그인이 없어 링크를 아는 사람은 누구나 볼 수 있습니다. 남이 봐도 괜찮은 내용만 넣으세요.</div>
+
+<header class="app-header">
+  <h1>계획 · 실행 · 돌아보기</h1>
+  <div class="header-controls">
+    <label for="planSelect">현재 계획</label>
+    <select id="planSelect"></select>
+    <button id="exportBtn" type="button">내 데이터 내보내기</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button id="tab-plans" class="tab active" type="button">계획</button>
+  <button id="tab-todos" class="tab" type="button">할 일</button>
+  <button id="tab-review" class="tab" type="button">돌아보기</button>
+</nav>
+
+<main>
+  <section id="panel-plans" class="panel active">
+    <h2 id="planFormTitle">새 계획 만들기</h2>
+    <form id="planForm" class="form-grid">
+      <input type="hidden" id="planEditingId">
+      <label>제목<input name="title" required></label>
+      <label>우선순위
+        <select name="priority">
+          <option value="high">높음</option>
+          <option value="medium" selected>중간</option>
+          <option value="low">낮음</option>
+        </select>
+      </label>
+      <label>시작일<input type="date" name="period_start" required></label>
+      <label>종료일<input type="date" name="period_end" required></label>
+      <label>예상 시간(분)<input type="number" name="estimated_minutes" min="0" value="0"></label>
+      <label>성공 기준<textarea name="success_criteria" required placeholder="무엇을 이루면 성공인지"></textarea></label>
+      <label style="grid-column:1/-1">이전 계획에서 넘어온 메모(자동으로 채워짐, 수정 가능)
+        <textarea id="carriedOverNote"></textarea>
+      </label>
+      <div class="form-actions">
+        <button type="submit">저장</button>
+        <button type="button" id="planFormCancel">취소</button>
+      </div>
+    </form>
+
+    <h2>내 계획 목록</h2>
+    <div id="plansList"></div>
+  </section>
+
+  <section id="panel-todos" class="panel">
+    <h2 id="todoFormTitle">새 할 일 만들기</h2>
+    <form id="todoForm" class="form-grid">
+      <input type="hidden" id="todoEditingId">
+      <label>제목<input name="title" required></label>
+      <label>우선순위
+        <select name="priority">
+          <option value="high">높음</option>
+          <option value="medium" selected>중간</option>
+          <option value="low">낮음</option>
+        </select>
+      </label>
+      <label>마감일<input type="datetime-local" name="deadline"></label>
+      <label>예상 시간(분)<input type="number" name="estimated_minutes" min="0" value="0"></label>
+      <label>태그(쉼표로 구분)<input name="tags" placeholder="예: 운동, 아침"></label>
+      <label style="grid-column:1/-1">설명<textarea name="description"></textarea></label>
+      <div class="form-actions">
+        <button type="submit">저장</button>
+        <button type="button" id="todoFormCancel">취소</button>
+      </div>
+    </form>
+
+    <div class="toolbar">
+      <input id="todoSearch" type="search" placeholder="검색 (제목/설명/태그)">
+      <select id="todoStatusFilter">
+        <option value="all">전체 상태</option>
+        <option value="in_progress">진행 중</option>
+        <option value="completed">완료</option>
+      </select>
+      <select id="todoSort">
+        <option value="deadline_asc">마감일 빠른 순</option>
+        <option value="deadline_desc">마감일 늦은 순</option>
+        <option value="priority_desc">우선순위 높은 순</option>
+        <option value="estimated_desc">예상 시간 많은 순</option>
+        <option value="created_desc">최근 만든 순</option>
+      </select>
+    </div>
+    <p id="todoSortLabel" class="sort-label"></p>
+    <div id="todosList"></div>
+  </section>
+
+  <section id="panel-review" class="panel">
+    <h2>돌아보기</h2>
+    <div id="reviewSummary"></div>
+    <form id="retroForm" class="form-grid">
+      <label style="grid-column:1/-1">이번 계획에서 다음으로 넘길 고칠 점 한 가지
+        <textarea id="retroNoteInput"></textarea>
+      </label>
+      <div class="form-actions"><button type="submit">저장</button></div>
+    </form>
+  </section>
+</main>
+
+<div id="todoDetailModal" class="modal">
+  <div class="modal-content">
+    <button id="todoDetailClose" class="modal-close" type="button">닫기</button>
+    <h3 id="todoDetailTitle">실행 기록</h3>
+    <div id="executionLogsList"></div>
+    <h4>실행 기록 추가</h4>
+    <form id="executionLogForm" class="form-grid">
+      <label>시작 시각<input type="datetime-local" name="started_at" required></label>
+      <label>끝난 시각<input type="datetime-local" name="ended_at" required></label>
+      <label style="grid-column:1/-1">막혔던 이유(있다면)<input name="blocked_reason"></label>
+      <div class="form-actions"><button type="submit">기록 저장</button></div>
+    </form>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
