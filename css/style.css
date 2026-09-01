@@ -253,9 +253,8 @@ button[type="submit"]:hover, #exportBtn:hover { background: var(--primary-dark);
   padding: 8px 10px;
   border-radius: var(--radius-sm);
   margin-top: 6px;
-  border-left: 2px solid var(--primary);
 }
-.note.danger { background: var(--danger-tint); color: var(--danger); border-left-color: var(--danger); }
+.note.danger { background: var(--danger-tint); color: var(--danger); }
 .empty {
   color: var(--text-faint);
   font-size: 13px;
