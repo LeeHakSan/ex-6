@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient.js';
+import { api } from './api.js';
 import { escapeHtml, fmtDateTime, toLocalInputValue, localInputToISO, PRIORITY_RANK, PRIORITY_LABEL } from './utils.js';
 import { getSelectedPlanId } from './plans.js';
 import { showTab } from './tabs.js';
@@ -31,19 +31,16 @@ export async function loadTodos() {
     renderTodos();
     return;
   }
-  // 서버(Supabase)에서 계획에 속한, 삭제되지 않은 할 일을 가져온 뒤
+  // 서버(API)에서 계획에 속한, 삭제되지 않은 할 일을 가져온 뒤
   // 검색/필터/정렬은 화면(JS)에서 결정한다 — 정렬 기준과 동률 처리 규칙을 여기 한 곳에서만 관리하기 위함.
-  const { data, error } = await supabase
-    .from('todos')
-    .select('*, execution_logs(*)')
-    .eq('plan_id', planId)
-    .is('deleted_at', null);
-  if (error) {
-    console.error(error);
-    alert('할 일을 불러오지 못했습니다: ' + error.message);
+  try {
+    const { todos: data } = await api.listTodos(planId);
+    todos = data || [];
+  } catch (err) {
+    console.error(err);
+    alert('할 일을 불러오지 못했습니다: ' + err.message);
     return;
   }
-  todos = data || [];
   renderTodos();
 }
 
@@ -126,7 +123,12 @@ function renderTodos() {
     })
     .join('');
 
-  listEl.querySelectorAll('.btn-detail').forEach((b) => b.addEventListener('click', () => openTodoDetail(b.dataset.id)));
+  listEl.querySelectorAll('.btn-detail').forEach((b) =>
+    b.addEventListener('click', () => {
+      const todo = todos.find((t) => t.id === b.dataset.id);
+      if (todo) openTodoDetail(todo);
+    })
+  );
   listEl.querySelectorAll('.btn-edit').forEach((b) => b.addEventListener('click', () => startEdit(b.dataset.id)));
   listEl.querySelectorAll('.btn-complete').forEach((b) => b.addEventListener('click', () => completeTodo(b.dataset.id)));
   listEl.querySelectorAll('.btn-revert').forEach((b) => b.addEventListener('click', () => revertTodo(b.dataset.id)));
@@ -177,12 +179,15 @@ async function saveTodo(e) {
     return;
   }
 
-  const editingId = editingIdField.value;
-  const { error } = editingId
-    ? await supabase.from('todos').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', editingId)
-    : await supabase.from('todos').insert(payload);
-  if (error) {
-    alert('저장 실패: ' + error.message);
+  try {
+    const editingId = editingIdField.value;
+    if (editingId) {
+      await api.updateTodo(editingId, payload);
+    } else {
+      await api.createTodo(payload);
+    }
+  } catch (err) {
+    alert('저장 실패: ' + err.message);
     return;
   }
   resetForm();
@@ -190,28 +195,20 @@ async function saveTodo(e) {
 }
 
 async function completeTodo(id) {
-  // status가 'in_progress'일 때만 UPDATE가 적용되도록 조건을 걸어,
-  // 완료 버튼을 연달아 눌러도 completed_at이 다시 바뀌거나 중복 처리되지 않게 한다(멱등).
-  const { error } = await supabase
-    .from('todos')
-    .update({ status: 'completed', completed_at: new Date().toISOString() })
-    .eq('id', id)
-    .eq('status', 'in_progress');
-  if (error) {
-    alert('완료 처리 실패: ' + error.message);
+  try {
+    await api.updateTodo(id, { action: 'complete' });
+  } catch (err) {
+    alert('완료 처리 실패: ' + err.message);
     return;
   }
   await loadTodos();
 }
 
 async function revertTodo(id) {
-  const { error } = await supabase
-    .from('todos')
-    .update({ status: 'in_progress', completed_at: null })
-    .eq('id', id)
-    .eq('status', 'completed');
-  if (error) {
-    alert('되돌리기 실패: ' + error.message);
+  try {
+    await api.updateTodo(id, { action: 'revert' });
+  } catch (err) {
+    alert('되돌리기 실패: ' + err.message);
     return;
   }
   await loadTodos();
@@ -219,9 +216,10 @@ async function revertTodo(id) {
 
 async function deleteTodo(id) {
   if (!confirm('이 할 일을 삭제할까요?')) return;
-  const { error } = await supabase.from('todos').update({ deleted_at: new Date().toISOString() }).eq('id', id);
-  if (error) {
-    alert('삭제 실패: ' + error.message);
+  try {
+    await api.updateTodo(id, { action: 'delete' });
+  } catch (err) {
+    alert('삭제 실패: ' + err.message);
     return;
   }
   await loadTodos();

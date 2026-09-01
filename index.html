@@ -9,7 +9,35 @@
 </head>
 <body>
 
-<div class="public-banner">지금은 로그인이 없어 링크를 아는 사람은 누구나 볼 수 있습니다. 남이 봐도 괜찮은 내용만 넣으세요.</div>
+<div id="authScreen" class="auth-screen">
+  <div class="auth-box">
+    <div class="brand">
+      <span class="brand-mark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>
+        </svg>
+      </span>
+      <h1>계획 · 실행 · 돌아보기</h1>
+    </div>
+    <div class="auth-tabs">
+      <button id="authTabLogin" class="auth-tab active" type="button">로그인</button>
+      <button id="authTabSignup" class="auth-tab" type="button">회원가입</button>
+    </div>
+    <form id="loginForm" class="auth-form">
+      <label>이메일<input type="email" name="email" required autocomplete="username"></label>
+      <label>비밀번호<input type="password" name="password" required autocomplete="current-password"></label>
+      <button type="submit">로그인</button>
+    </form>
+    <form id="signupForm" class="auth-form" hidden>
+      <label>이메일<input type="email" name="email" required autocomplete="username"></label>
+      <label>비밀번호(8자 이상)<input type="password" name="password" required minlength="8" autocomplete="new-password"></label>
+      <button type="submit">회원가입</button>
+    </form>
+    <p id="authError" class="auth-error" hidden></p>
+  </div>
+</div>
+
+<div id="appRoot" hidden>
 
 <header class="app-header">
   <div class="brand">
@@ -24,6 +52,9 @@
     <label for="planSelect">현재 계획</label>
     <select id="planSelect"></select>
     <button id="exportBtn" type="button">내 데이터 내보내기</button>
+    <span id="userEmailLabel" class="user-email"></span>
+    <button id="logoutBtn" type="button">로그아웃</button>
+    <button id="deleteAccountBtn" type="button" class="btn-delete">계정 삭제</button>
   </div>
 </header>
 
@@ -146,6 +177,8 @@
       <div class="form-actions"><button type="submit">기록 저장</button></div>
     </form>
   </div>
+</div>
+
 </div>
 
 <script type="module" src="js/main.js"></script>

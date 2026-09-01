@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient.js';
+import { api } from './api.js';
 import { escapeHtml, fmtDate, fmtDateTime, PRIORITY_LABEL } from './utils.js';
 
 const listEl = document.getElementById('plansList');
@@ -10,16 +10,14 @@ const editingIdField = document.getElementById('planEditingId');
 let plans = [];
 
 export async function loadPlans() {
-  const { data, error } = await supabase
-    .from('plans')
-    .select('*')
-    .order('created_at', { ascending: false });
-  if (error) {
-    console.error(error);
-    alert('계획을 불러오지 못했습니다: ' + error.message);
+  try {
+    const { plans: data } = await api.listPlans();
+    plans = data || [];
+  } catch (err) {
+    console.error(err);
+    alert('계획을 불러오지 못했습니다: ' + err.message);
     return;
   }
-  plans = data || [];
   renderPlansList();
   renderPlanSelect();
   if (!editingIdField.value) prefillCarriedOverNote();
@@ -100,13 +98,12 @@ async function toggleRevisions(id) {
     el.hidden = true;
     return;
   }
-  const { data, error } = await supabase
-    .from('plan_revisions')
-    .select('*')
-    .eq('plan_id', id)
-    .order('revised_at', { ascending: false });
-  if (error) {
-    console.error(error);
+  let data;
+  try {
+    const res = await api.listRevisions(id);
+    data = res.revisions || [];
+  } catch (err) {
+    console.error(err);
     return;
   }
   el.innerHTML = !data.length
@@ -125,20 +122,6 @@ async function toggleRevisions(id) {
         )
         .join('');
   el.hidden = false;
-}
-
-function snapshotPayload(p) {
-  return {
-    plan_id: p.id,
-    title: p.title,
-    period_start: p.period_start,
-    period_end: p.period_end,
-    priority: p.priority,
-    success_criteria: p.success_criteria,
-    estimated_minutes: p.estimated_minutes,
-    carried_over_note: p.carried_over_note,
-    retro_note: p.retro_note,
-  };
 }
 
 async function savePlan(e) {
@@ -161,46 +144,26 @@ async function savePlan(e) {
     return;
   }
 
-  const editingId = editingIdField.value;
-  if (editingId) {
-    const current = plans.find((p) => p.id === editingId);
-    if (current) {
-      const { error: revError } = await supabase.from('plan_revisions').insert(snapshotPayload(current));
-      if (revError) {
-        console.error(revError);
-        alert('수정 이력 저장 실패: ' + revError.message);
-        return;
-      }
+  try {
+    const editingId = editingIdField.value;
+    if (editingId) {
+      await api.updatePlan(editingId, payload);
+    } else {
+      await api.createPlan(payload);
     }
-    const { error } = await supabase
-      .from('plans')
-      .update({ ...payload, updated_at: new Date().toISOString() })
-      .eq('id', editingId);
-    if (error) {
-      alert('계획 수정 실패: ' + error.message);
-      return;
-    }
-  } else {
-    const { error } = await supabase.from('plans').insert(payload);
-    if (error) {
-      alert('계획 생성 실패: ' + error.message);
-      return;
-    }
+  } catch (err) {
+    alert('저장 실패: ' + err.message);
+    return;
   }
   resetForm();
   await loadPlans();
 }
 
 export async function saveRetroNote(planId, note) {
-  const current = plans.find((p) => p.id === planId);
-  if (!current) return;
-  await supabase.from('plan_revisions').insert(snapshotPayload(current));
-  const { error } = await supabase
-    .from('plans')
-    .update({ retro_note: note, updated_at: new Date().toISOString() })
-    .eq('id', planId);
-  if (error) {
-    alert('고칠 점 저장 실패: ' + error.message);
+  try {
+    await api.updatePlan(planId, { retro_note: note });
+  } catch (err) {
+    alert('고칠 점 저장 실패: ' + err.message);
     return;
   }
   await loadPlans();

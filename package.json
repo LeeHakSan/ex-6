@@ -1,0 +1,12 @@
+{
+  "name": "ex-6",
+  "private": true,
+  "version": "1.0.0",
+  "description": "T06/T07 계획·실행·돌아보기 다이어리 + 인증",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "cookie": "^0.6.0"
+  }
+}

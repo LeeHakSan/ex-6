@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient.js';
+import { api } from './api.js';
 import { escapeHtml } from './utils.js';
 import { getSelectedPlanId, getPlans, saveRetroNote } from './plans.js';
 
@@ -14,14 +14,13 @@ export async function loadReview() {
     return;
   }
 
-  const { data: todos, error } = await supabase
-    .from('todos')
-    .select('*, execution_logs(*)')
-    .eq('plan_id', planId)
-    .is('deleted_at', null);
-  if (error) {
-    console.error(error);
-    alert('돌아보기 집계를 불러오지 못했습니다: ' + error.message);
+  let todos;
+  try {
+    const res = await api.listTodos(planId);
+    todos = res.todos || [];
+  } catch (err) {
+    console.error(err);
+    alert('돌아보기 집계를 불러오지 못했습니다: ' + err.message);
     return;
   }
 
