@@ -1,0 +1,214 @@
+{
+  "exported_at": "2026-09-01T02:32:46.842Z",
+  "plans": [
+    {
+      "id": "1fa45d85-2eed-4f51-9b5f-904ec63c935b",
+      "title": "오늘 배운 파이썬 코드 복습하기",
+      "period_start": "2026-09-01",
+      "period_end": "2026-09-02",
+      "priority": "medium",
+      "success_criteria": "복습 하면 성공",
+      "estimated_minutes": 40,
+      "carried_over_note": null,
+      "retro_note": "다음엔 복습을 미루지 말고 배운 당일 30분 안에 바로 끝내기",
+      "created_at": "2026-09-01T02:28:08.90895+00:00",
+      "updated_at": "2026-09-01T02:31:19.484+00:00"
+    }
+  ],
+  "plan_revisions": [
+    {
+      "id": "318c3447-81d7-45ad-8c21-a826c3d7faec",
+      "plan_id": "1fa45d85-2eed-4f51-9b5f-904ec63c935b",
+      "title": "오늘 배운 파이썬 코드 복습하기",
+      "period_start": "2026-09-01",
+      "period_end": "2026-09-02",
+      "priority": "medium",
+      "success_criteria": "복습 하면 성공",
+      "estimated_minutes": 30,
+      "carried_over_note": null,
+      "retro_note": null,
+      "revised_at": "2026-09-01T02:28:10.320596+00:00"
+    },
+    {
+      "id": "90572ba5-f2ce-4a00-aca3-7228b996793f",
+      "plan_id": "1fa45d85-2eed-4f51-9b5f-904ec63c935b",
+      "title": "오늘 배운 파이썬 코드 복습하기",
+      "period_start": "2026-09-01",
+      "period_end": "2026-09-02",
+      "priority": "medium",
+      "success_criteria": "복습 하면 성공",
+      "estimated_minutes": 40,
+      "carried_over_note": null,
+      "retro_note": null,
+      "revised_at": "2026-09-01T02:30:23.533722+00:00"
+    }
+  ],
+  "todos": [
+    {
+      "id": "24261a02-a3a0-4374-a386-e37147416cdf",
+      "plan_id": "1fa45d85-2eed-4f51-9b5f-904ec63c935b",
+      "title": "클래스와 객체지향 기초 복습",
+      "description": null,
+      "deadline": "2026-08-31T11:00:00+00:00",
+      "priority": "low",
+      "tags": [
+        "파이썬",
+        "OOP"
+      ],
+      "estimated_minutes": 25,
+      "status": "in_progress",
+      "completed_at": null,
+      "deleted_at": null,
+      "created_at": "2026-09-01T02:28:14.177123+00:00",
+      "updated_at": "2026-09-01T02:28:14.177123+00:00"
+    },
+    {
+      "id": "a0eb63dd-b9dc-48df-a798-9531748bf83b",
+      "plan_id": "1fa45d85-2eed-4f51-9b5f-904ec63c935b",
+      "title": "오늘 배운 예제 코드 직접 타이핑",
+      "description": null,
+      "deadline": "2026-09-02T13:00:00+00:00",
+      "priority": "high",
+      "tags": [
+        "파이썬",
+        "실습"
+      ],
+      "estimated_minutes": 30,
+      "status": "in_progress",
+      "completed_at": null,
+      "deleted_at": null,
+      "created_at": "2026-09-01T02:28:14.788829+00:00",
+      "updated_at": "2026-09-01T02:28:14.788829+00:00"
+    },
+    {
+      "id": "07f72f5d-a76f-4c2e-9935-f79602fc7442",
+      "plan_id": "1fa45d85-2eed-4f51-9b5f-904ec63c935b",
+      "title": "예외처리(try/except) 복습",
+      "description": "오늘 배운 try/except/finally 구문 다시 정리",
+      "deadline": "2026-09-02T11:00:00+00:00",
+      "priority": "medium",
+      "tags": [
+        "파이썬",
+        "예외처리"
+      ],
+      "estimated_minutes": 15,
+      "status": "in_progress",
+      "completed_at": null,
+      "deleted_at": null,
+      "created_at": "2026-09-01T02:28:13.605099+00:00",
+      "updated_at": "2026-09-01T02:29:52.161+00:00"
+    },
+    {
+      "id": "02693010-60ea-4f3c-b598-ef0167a04f24",
+      "plan_id": "1fa45d85-2eed-4f51-9b5f-904ec63c935b",
+      "title": "리스트/딕셔너리 컴프리헨션 복습",
+      "description": null,
+      "deadline": "2026-09-01T12:00:00+00:00",
+      "priority": "high",
+      "tags": [
+        "파이썬",
+        "복습"
+      ],
+      "estimated_minutes": 20,
+      "status": "in_progress",
+      "completed_at": null,
+      "deleted_at": null,
+      "created_at": "2026-09-01T02:28:12.587058+00:00",
+      "updated_at": "2026-09-01T02:28:12.587058+00:00"
+    },
+    {
+      "id": "4936f632-3033-4a76-9e00-e4840ad5d3de",
+      "plan_id": "1fa45d85-2eed-4f51-9b5f-904ec63c935b",
+      "title": "여분 항목(삭제 테스트용)",
+      "description": null,
+      "deadline": "2026-09-02T14:00:00+00:00",
+      "priority": "low",
+      "tags": [
+        "테스트"
+      ],
+      "estimated_minutes": 5,
+      "status": "in_progress",
+      "completed_at": null,
+      "deleted_at": "2026-09-01T02:29:54.911+00:00",
+      "created_at": "2026-09-01T02:28:15.304165+00:00",
+      "updated_at": "2026-09-01T02:28:15.304165+00:00"
+    },
+    {
+      "id": "c3f9eaf9-7cd1-402c-80d1-2f00c344180a",
+      "plan_id": "1fa45d85-2eed-4f51-9b5f-904ec63c935b",
+      "title": "함수 인자(*args, **kwargs) 복습",
+      "description": null,
+      "deadline": "2026-09-01T13:00:00+00:00",
+      "priority": "medium",
+      "tags": [
+        "파이썬",
+        "함수"
+      ],
+      "estimated_minutes": 20,
+      "status": "completed",
+      "completed_at": "2026-09-01T02:29:57.209+00:00",
+      "deleted_at": null,
+      "created_at": "2026-09-01T02:28:13.05323+00:00",
+      "updated_at": "2026-09-01T02:28:13.05323+00:00"
+    },
+    {
+      "id": "d49e7013-ecc3-4284-a8c3-22c5902e002b",
+      "plan_id": "1fa45d85-2eed-4f51-9b5f-904ec63c935b",
+      "title": "<script>alert('xss')</script>",
+      "description": null,
+      "deadline": null,
+      "priority": "medium",
+      "tags": [],
+      "estimated_minutes": 0,
+      "status": "in_progress",
+      "completed_at": null,
+      "deleted_at": "2026-09-01T02:32:12.738+00:00",
+      "created_at": "2026-09-01T02:30:25.801879+00:00",
+      "updated_at": "2026-09-01T02:30:25.801879+00:00"
+    },
+    {
+      "id": "442389c7-5e43-41a7-99f2-17931fcf0e57",
+      "plan_id": "1fa45d85-2eed-4f51-9b5f-904ec63c935b",
+      "title": "<script>alert('xss')</script>",
+      "description": null,
+      "deadline": null,
+      "priority": "medium",
+      "tags": [],
+      "estimated_minutes": 0,
+      "status": "in_progress",
+      "completed_at": null,
+      "deleted_at": "2026-09-01T02:32:44.72+00:00",
+      "created_at": "2026-09-01T02:31:15.218461+00:00",
+      "updated_at": "2026-09-01T02:31:15.218461+00:00"
+    }
+  ],
+  "execution_logs": [
+    {
+      "id": "4b61ed05-f4d5-49c4-afb9-7329feb5917a",
+      "todo_id": "a0eb63dd-b9dc-48df-a798-9531748bf83b",
+      "started_at": "2026-09-01T11:00:00+00:00",
+      "ended_at": "2026-09-01T11:25:00+00:00",
+      "actual_minutes": 25,
+      "blocked_reason": null,
+      "created_at": "2026-09-01T02:30:15.150291+00:00"
+    },
+    {
+      "id": "4984aa59-06fc-4a5c-b7e7-d0f305fff5d7",
+      "todo_id": "a0eb63dd-b9dc-48df-a798-9531748bf83b",
+      "started_at": "2026-09-02T12:00:00+00:00",
+      "ended_at": "2026-09-02T12:35:00+00:00",
+      "actual_minutes": 35,
+      "blocked_reason": null,
+      "created_at": "2026-09-01T02:30:15.767982+00:00"
+    },
+    {
+      "id": "2775b28e-a5ae-4030-a85b-85bb7c50d6dc",
+      "todo_id": "24261a02-a3a0-4374-a386-e37147416cdf",
+      "started_at": "2026-08-31T11:00:00+00:00",
+      "ended_at": "2026-08-31T11:15:00+00:00",
+      "actual_minutes": 15,
+      "blocked_reason": "상속 개념이 헷갈려서 중단함",
+      "created_at": "2026-09-01T02:30:17.469791+00:00"
+    }
+  ]
+}
