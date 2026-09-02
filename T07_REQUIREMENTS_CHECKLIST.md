@@ -162,14 +162,14 @@
 
 ---
 
-## 아키텍처 결정 (카드 1 대응, T06 연장선)
+## 아키텍처 결정 (카드 1 대응, 실제 채택안)
 
-- T06이 이미 **Supabase**를 쓰고 있으므로, **Supabase Auth**(GoTrue, 이메일/비밀번호)를 인증 서비스로 채택 추천.
-  - 이름·버전: `@supabase/supabase-js` v2 내장 Auth (GoTrue)
-  - 검토했지만 고르지 않은 방법: 직접 구현(bcrypt+세션 직접 관리) — 비밀번호 저장·토큰 발급·만료를 직접 다뤄야 해서 구현·검증 비용이 크고, 이미 Supabase 인프라를 쓰고 있어 RLS와 자연스럽게 연동되는 Supabase Auth가 남의 자료 차단(카드4)까지 한 번에 해결됨.
-  - 비밀번호 해시: Supabase Auth 내부적으로 bcrypt 사용 (T07-C107: 라이브러리에 맡김, 직접 구현 아님).
-  - 세션 식별: JWT 기반 access token(단, `localStorage`가 아니라 Supabase 기본 저장 방식 확인 필요) + refresh token, 만료 시각 존재.
-  - 데이터 소유권: 각 테이블에 `user_id` 컬럼 추가 + RLS 정책을 `auth.uid() = user_id`로 교체(현재는 익명 전체 허용 정책이라 반드시 변경 필요).
+- **직접 구현(bcrypt + JWT)**을 선택. Supabase Auth(GoTrue) 사용도 함께 검토했으나, "직접 만들어서 인증 흐름 자체를 증명하고 싶다"는 이유로 직접 구현 채택.
+  - 이름·버전: `bcryptjs@2.4.3`(비밀번호 해시), `jsonwebtoken@9.0.2`(토큰 서명/검증), `cookie@0.6.0`(쿠키 직렬화) — 모두 `package.json`에 고정.
+  - 검토했지만 고르지 않은 방법: Supabase Auth(GoTrue) — 이미 Supabase 인프라를 쓰고 있어 붙이기는 더 쉬웠겠지만, 인증 로직을 라이브러리 뒤에 완전히 숨기게 되어 "어떻게 붙였는지 설명하기"라는 이 과제의 취지(가입→해시→세션→소유권 검사까지 전 과정을 직접 보여주기)에는 직접 구현이 더 맞다고 판단.
+  - 비밀번호 해시: `bcryptjs`, cost factor 12.
+  - 세션 식별: **토큰(JWT)** — 서버가 발급한 JWT를 httpOnly 쿠키로 전달. 다만 순수 stateless JWT는 로그아웃해도 만료 전까지 유효해 "로그아웃 후 거절" 요구를 못 지키므로, `sessions` 테이블(서버 측 세션 레코드)을 두고 JWT의 `sid` 클레임으로 그 레코드를 가리키게 해서 로그아웃 시 `revoked_at`을 찍어 즉시 무효화한다.
+  - 데이터 소유권: `plans`/`todos`/`execution_logs`/`plan_revisions`에 `user_id` 컬럼 추가. RLS는 기존 anon 허용 정책을 전부 삭제해 잠그고, 백엔드(`/api`)만 `SUPABASE_SERVICE_ROLE_KEY`로 RLS를 우회해 접근하며, 매 쿼리마다 애플리케이션 코드에서 `user_id = 로그인한 사용자`를 직접 검사한다(RLS가 아니라 API 레이어에서 소유권 판단).
 
 ## 진행 순서 제안
 1. Supabase Auth 활성화, 로그인/가입/로그아웃 UI 추가
