@@ -29,12 +29,12 @@ export const api = {
 
   listPlans: () => request('/data/plans'),
   createPlan: (payload) => request('/data/plans', { method: 'POST', body: JSON.stringify(payload) }),
-  updatePlan: (id, patch) => request(`/data/plans/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),
-  listRevisions: (id) => request(`/data/plans/${id}/revisions`),
+  updatePlan: (id, patch) => request(`/data/plans?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) }),
+  listRevisions: (id) => request(`/data/plan-revisions?plan_id=${encodeURIComponent(id)}`),
 
   listTodos: (planId) => request(`/data/todos?plan_id=${encodeURIComponent(planId)}`),
   createTodo: (payload) => request('/data/todos', { method: 'POST', body: JSON.stringify(payload) }),
-  updateTodo: (id, patch) => request(`/data/todos/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),
+  updateTodo: (id, patch) => request(`/data/todos?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) }),
 
   createExecutionLog: (payload) => request('/data/execution-logs', { method: 'POST', body: JSON.stringify(payload) }),
 
