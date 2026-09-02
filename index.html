@@ -23,12 +23,12 @@
       <button id="authTabLogin" class="auth-tab active" type="button">로그인</button>
       <button id="authTabSignup" class="auth-tab" type="button">회원가입</button>
     </div>
-    <form id="loginForm" class="auth-form">
+    <form id="loginForm" class="auth-form" method="post" action=".">
       <label>이메일<input type="email" name="email" required autocomplete="username"></label>
       <label>비밀번호<input type="password" name="password" required autocomplete="current-password"></label>
       <button type="submit">로그인</button>
     </form>
-    <form id="signupForm" class="auth-form" hidden>
+    <form id="signupForm" class="auth-form" method="post" action="." hidden>
       <label>이메일<input type="email" name="email" required autocomplete="username"></label>
       <label>비밀번호
         <input type="password" name="password" required minlength="8" autocomplete="new-password">
