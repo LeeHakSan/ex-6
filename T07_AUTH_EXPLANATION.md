@@ -40,8 +40,10 @@ DB 변경: `sql/schema-v3-auth.sql`에서 `users`/`sessions` 테이블 신설, `
 POST /api/auth/login  { "email": "...", "password": "(가려짐, 요청 바디는 HTTPS로 암호화되어 전송됨)" }
 200  { "email": "alice-...@example.com" }   ← 응답에도 비밀번호 없음
 ```
-- 저장된 값 확인: `docs/screenshots/t07_users_table_password_hash.png` — `users.password_hash` 컬럼이 전부 `$2a$12$...` 형태의 bcrypt 해시로 저장되어 있고, 입력한 비밀번호 글자가 그대로 보이지 않는다.
-- 같은 비밀번호로 다른 값: 같은 스크린샷에서 `Passw0rd!123`을 똑같이 쓴 alice/bob 계열 테스트 계정 여러 개(`alice-...`, `bob-...`, `bob2-...` 등)의 `password_hash` 값이 서로 전부 다르다 — bcrypt가 계정마다 다른 salt를 자동으로 붙이기 때문.
+- 저장된 값 확인: `users.password_hash` 컬럼이 전부 `$2a$12$...` 형태의 bcrypt 해시로 저장되어 있고, 입력한 비밀번호 글자가 그대로 보이지 않는다.
+- 같은 비밀번호로 다른 값: 아래 스크린샷에서 `Passw0rd!123`을 똑같이 쓴 alice/bob 계열 테스트 계정 여러 개(`alice-...`, `bob-...`, `bob2-...` 등)의 `password_hash` 값이 서로 전부 다르다 — bcrypt가 계정마다 다른 salt를 자동으로 붙이기 때문.
+
+![users 테이블의 password_hash 컬럼](docs/screenshots/t07_users_table_password_hash.png)
 
 ### 2) 세션 만료·로그아웃 후 재요청 거절 (카드3)
 사람을 알아보는 값: **토큰(JWT)**. 쿠키 이름 `session`, `httpOnly; Secure; SameSite=Lax`, 만료 7일. 로그아웃 시 서버 `sessions` 테이블의 `revoked_at`을 찍어 즉시 무효화(순수 stateless JWT라면 여기서 막히지 않음 — 그래서 세션 레코드를 별도로 둠).
@@ -84,6 +86,22 @@ Bob 목록에 Alice 계획 포함? → false
 POST /api/data/todos  { ..., "user_id": "bob-id-를-사칭" }  (Alice 세션)
 → 201, 실제 생성된 todo.user_id == Alice의 진짜 id (끼워 넣은 값 무시됨)
 ```
+
+## 부록 — 카드 5, 1일차 실사용 기록
+
+5일 실사용은 실제로 다른 날짜에 걸쳐야 하는 항목이라 지어낼 수 없다. 그래서 지어내는 대신
+**1일차(2026-09-02)만 실제 계정(`test1@test.com`)으로 진짜 사용하고, 나머지 4일은 못 채웠음을
+그대로 밝힌다.**
+
+- 1일차 질문: "오늘 계획한 할 일을 얼마나 완료했는가?"
+- 관찰 지표: 완료한 할 일 개수 (단위: 건)
+- 계산 규칙: 그날 상태가 "완료"로 바뀐 할 일 수를 그대로 센다
+
+오늘 실제로 할 일 하나를 완료 처리하고 실행 기록을 추가한 결과(완료 2건, 실제 시간 95분으로 반영됨):
+
+![1일차 실행 기록 추가](docs/screenshots/t07_day1_execution_log.png)
+
+![1일차 돌아보기 — 완료 2건, 실제 시간 95분](docs/screenshots/t07_day1_review.png)
 
 ## ⑤ AI와 나
 
