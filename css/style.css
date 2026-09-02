@@ -162,6 +162,8 @@ body {
 }
 .header-controls select:hover,
 #planSelect:hover { border-color: var(--border-strong); }
+.header-controls select:disabled,
+#planSelect:disabled { opacity: 0.6; cursor: not-allowed; }
 .header-controls select:focus,
 #planSelect:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-tint); }
 .header-controls select option,

@@ -60,7 +60,9 @@ function renderPlanSelect() {
   const prev = selectEl.value;
   if (!plans.length) {
     selectEl.innerHTML = '<option value="">계획을 세워보세요!</option>';
+    selectEl.disabled = true;
   } else {
+    selectEl.disabled = false;
     selectEl.innerHTML = plans.map((p) => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join('');
     if (plans.some((p) => p.id === prev)) selectEl.value = prev;
   }
