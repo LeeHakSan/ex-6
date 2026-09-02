@@ -58,8 +58,12 @@ function renderPlansList() {
 
 function renderPlanSelect() {
   const prev = selectEl.value;
-  selectEl.innerHTML = plans.map((p) => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join('');
-  if (plans.some((p) => p.id === prev)) selectEl.value = prev;
+  if (!plans.length) {
+    selectEl.innerHTML = '<option value="">계획을 세워보세요!</option>';
+  } else {
+    selectEl.innerHTML = plans.map((p) => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join('');
+    if (plans.some((p) => p.id === prev)) selectEl.value = prev;
+  }
   // 계획 목록이 새로 로드될 때마다 select의 change 이벤트를 직접 발생시켜
   // todos.js / review.js가 현재 선택된 계획 기준으로 다시 로드하도록 만든다.
   selectEl.dispatchEvent(new Event('change'));
