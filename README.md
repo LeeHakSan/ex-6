@@ -58,3 +58,22 @@ Vercel: `npx vercel login` 으로 로그인한 뒤 `npx vercel --prod`로 배포
 - 프론트 코드(`js/supabaseClient.js`)에는 anon(public) key만 넣는다. service_role key는 어디에도 넣지 않는다.
 - 모든 사용자 입력은 `js/utils.js`의 `escapeHtml()`을 거쳐 렌더링되며, `innerHTML`에 원문을 직접 삽입하지 않는다.
 - 배포 전 브라우저 개발자도구 Network/Console, 배포 파일, Git 커밋 이력에 비밀키가 없는지 확인한다.
+
+---
+
+# T07 — 인증(가입/로그인/로그아웃) 붙이기
+
+T06에 이어서 가입/로그인/로그아웃을 붙였다. **더 이상 로그인 없이 접근 가능한 공개 앱이 아니다** —
+첫 화면은 로그인 화면이고, 로그인해야만 내 계획·할 일·실행 기록이 보인다.
+자세한 설계 이유·수정 위치·증거는 `T07_AUTH_EXPLANATION.md`, 항목별 체크는 `T07_REQUIREMENTS_CHECKLIST.md` 참고.
+
+## T07 추가 설정
+1. `sql/schema-v3-auth.sql`을 Supabase SQL Editor에서 실행 (users/sessions 테이블, RLS 잠금).
+2. T06 시절 데이터가 있다면 `sql/migrate-t06-data-to-owner.sql`로 실제 계정에 이관.
+3. Vercel 프로젝트 Settings → Environment Variables에 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`(Supabase의 secret/service_role 키), `JWT_SECRET`(임의의 긴 랜덤 문자열)을 등록 후 재배포.
+
+## 짧은 확인 방법 (T07, 4줄)
+- **어디로 가나요**: https://ex-6-seven.vercel.app/
+- **세 단계 안에 무엇을 하나요**: ① 계정 A로 가입·로그인해 계획을 하나 만든다 ② 로그아웃 후 계정 B로 새로 가입·로그인한다 ③ 계정 B 화면에서 계정 A의 계획이 목록에 보이거나 그 계획의 주소로 직접 접근해본다
+- **무엇이 보이면 통과인가요**: 계정 B의 "현재 계획" 목록에 계정 A의 계획이 전혀 없고, 계정 A의 계획 id로 직접 요청해도(`/api/data/plans?id=...`) `not found`만 돌아온다
+- **안 될 때는 무엇이 보이나요**: 계정 B 화면에 계정 A의 계획이 나타나거나, 그 계획을 수정·삭제할 수 있다
