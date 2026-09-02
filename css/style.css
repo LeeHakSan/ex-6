@@ -25,6 +25,9 @@
 }
 
 * { box-sizing: border-box; }
+/* hidden 속성은 항상 display:none이 이겨야 한다 — display를 지정하는
+   클래스(.auth-form, .panel 등)가 나중에 로드돼도 이 규칙이 덮어쓰지 못하게 함 */
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -79,6 +82,7 @@ body {
   font-family: inherit;
 }
 .auth-form input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-tint); }
+.field-hint { font-size: 11px; color: var(--text-faint); font-weight: 400; }
 .auth-form button[type="submit"] {
   margin-top: 4px;
   background: var(--primary);

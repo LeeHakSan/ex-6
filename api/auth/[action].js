@@ -16,6 +16,14 @@ function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
 }
 
+// 클라이언트 검증은 우회될 수 있으므로 서버에서도 동일한 비밀번호 정책을 강제한다.
+const SPECIAL_CHAR_RE = /[!"#$%&'()*+,\-./:;<=>?@[\]^_`{|}~]/;
+function passwordPolicyError(password) {
+  if (!password || password.length < 8) return '비밀번호는 8자 이상이어야 합니다.';
+  if (!SPECIAL_CHAR_RE.test(password)) return '비밀번호에 특수문자를 1개 이상 포함해 주세요.';
+  return null;
+}
+
 module.exports = async (req, res) => {
   const { action } = req.query;
   const db = getDb();
@@ -24,8 +32,12 @@ module.exports = async (req, res) => {
     if (action === 'signup' && req.method === 'POST') {
       const email = normalizeEmail(req.body?.email);
       const password = req.body?.password || '';
-      if (!email || !email.includes('@') || password.length < 8) {
-        return res.status(400).json({ error: '이메일과 8자 이상의 비밀번호를 입력해 주세요.' });
+      if (!email || !email.includes('@')) {
+        return res.status(400).json({ error: '올바른 이메일을 입력해 주세요.' });
+      }
+      const pwError = passwordPolicyError(password);
+      if (pwError) {
+        return res.status(400).json({ error: pwError });
       }
       const { data: existing } = await db.from('users').select('id').eq('email', email).maybeSingle();
       if (existing) {

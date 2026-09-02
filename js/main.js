@@ -19,6 +19,13 @@ const deleteAccountBtn = document.getElementById('deleteAccountBtn');
 
 let appInitialized = false;
 
+const SPECIAL_CHAR_RE = /[!"#$%&'()*+,\-./:;<=>?@[\]^_`{|}~]/;
+function validatePassword(pw) {
+  if (pw.length < 8) return '비밀번호는 8자 이상이어야 합니다.';
+  if (!SPECIAL_CHAR_RE.test(pw)) return '비밀번호에 특수문자를 1개 이상 포함해 주세요.';
+  return null;
+}
+
 function setAuthError(msg) {
   authError.textContent = msg || '';
   authError.hidden = !msg;
@@ -83,8 +90,19 @@ async function handleLogin(e) {
 async function handleSignup(e) {
   e.preventDefault();
   setAuthError('');
+  const password = signupForm.password.value;
+  const password2 = signupForm.password2.value;
+  if (password !== password2) {
+    setAuthError('비밀번호 확인이 일치하지 않습니다.');
+    return;
+  }
+  const pwError = validatePassword(password);
+  if (pwError) {
+    setAuthError(pwError);
+    return;
+  }
   try {
-    await api.signup(signupForm.email.value.trim().toLowerCase(), signupForm.password.value);
+    await api.signup(signupForm.email.value.trim().toLowerCase(), password);
     signupForm.reset();
     await checkSession();
   } catch (err) {
