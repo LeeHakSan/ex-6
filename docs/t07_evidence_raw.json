@@ -1,0 +1,195 @@
+[
+  {
+    "section": "C94 회원가입 성공 (Alice)",
+    "request": {
+      "email": "alice-1788315183957@example.com",
+      "password": "(가려짐)"
+    },
+    "status": 201,
+    "response": {
+      "email": "alice-1788315183957@example.com"
+    }
+  },
+  {
+    "section": "C98 같은 이메일 재가입 거부",
+    "request": {
+      "email": "alice-1788315183957@example.com"
+    },
+    "status": 409,
+    "response": {
+      "error": "이미 가입된 이메일입니다."
+    }
+  },
+  {
+    "section": "C95 로그인 성공 (Alice)",
+    "request": {
+      "email": "alice-1788315183957@example.com",
+      "password": "(가려짐)"
+    },
+    "status": 200,
+    "response": {
+      "email": "alice-1788315183957@example.com"
+    },
+    "sessionCookie": "eyJhbGciOiJI...(생략)...gJ5Xt0"
+  },
+  {
+    "section": "C99 존재하는 계정의 틀린 비번 응답",
+    "status": 401,
+    "response": {
+      "error": "이메일 또는 비밀번호가 올바르지 않습니다."
+    }
+  },
+  {
+    "section": "C99 존재하지 않는 계정 응답",
+    "status": 401,
+    "response": {
+      "error": "이메일 또는 비밀번호가 올바르지 않습니다."
+    }
+  },
+  {
+    "section": "C99 두 메시지 동일 여부",
+    "identical": true
+  },
+  {
+    "section": "C97/C124 로그인하지 않은 채 자료 요청",
+    "status": 401,
+    "response": {
+      "error": "not authenticated"
+    }
+  },
+  {
+    "section": "로그인 상태에서 자료 요청 성공",
+    "status": 200,
+    "response": {
+      "plans": []
+    }
+  },
+  {
+    "section": "C109/C110 로그아웃 전: GET /api/data/plans (세션 O)",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "section": "로그아웃 요청",
+    "status": 200,
+    "response": {
+      "ok": true
+    }
+  },
+  {
+    "section": "C109/C110/C114 로그아웃 후: 같은 주소·같은 방식·같은 세션 값으로 재요청",
+    "status": 401,
+    "response": {
+      "error": "not authenticated"
+    }
+  },
+  {
+    "section": "C112 로그인 응답 바디에 토큰이 없는지(쿠키로만 전달)",
+    "loginResponseBodyKeys": [
+      "email"
+    ]
+  },
+  {
+    "section": "C116 계정 두 개 생성 + 각자 자료 추가",
+    "alice": {
+      "email": "alice-1788315183957@example.com",
+      "planId": "8911e209-5fe5-4516-b9de-9a2a42fcc0a8"
+    },
+    "bob": {
+      "email": "bob-1788315183957@example.com",
+      "planId": "9675b90c-8f22-4b6f-abe6-2c89e63ce6b3"
+    }
+  },
+  {
+    "section": "C118 Bob이 Alice 계획을 수정 시도",
+    "url": "/api/data/plans?id=8911e209-5fe5-4516-b9de-9a2a42fcc0a8",
+    "status": 404,
+    "response": {
+      "error": "not found"
+    }
+  },
+  {
+    "section": "C120 반대 방향: Alice가 Bob 계획을 수정 시도",
+    "url": "/api/data/plans?id=9675b90c-8f22-4b6f-abe6-2c89e63ce6b3",
+    "status": 404,
+    "response": {
+      "error": "not found"
+    }
+  },
+  {
+    "section": "C125 목록에 상대방 자료 섞임 여부",
+    "aliceListHasBobPlan": false,
+    "bobListHasAlicePlan": false
+  },
+  {
+    "section": "C122 거절 시도 이후 Bob 계획 제목이 그대로인지",
+    "stillOriginalTitle": true
+  },
+  {
+    "section": "C123 요청 본문에 다른 계정 id를 끼워 넣어도 무시되고 내 자료로 생성됨",
+    "status": 201,
+    "createdUserIdField": "c953535a-88be-47e5-9b62-f9994a55ff5c",
+    "note": "서버는 body의 user_id를 절대 신뢰하지 않고 세션에서만 판단"
+  },
+  {
+    "section": "C117 Bob이 Alice 계획의 수정 이력(읽기)을 요청",
+    "url": "/api/data/plan-revisions?plan_id=0daca6e7-6cfc-4cb9-8d56-5ca8a0926231",
+    "status": 404,
+    "response": {
+      "error": "not found"
+    }
+  },
+  {
+    "section": "C117 Bob이 Alice의 할 일 목록(읽기)을 요청",
+    "url": "/api/data/todos?plan_id=0daca6e7-6cfc-4cb9-8d56-5ca8a0926231",
+    "status": 404,
+    "response": {
+      "error": "not found"
+    }
+  },
+  {
+    "section": "C119 Bob이 Alice의 할 일을 삭제 시도",
+    "url": "/api/data/todos?id=ffbcd33e-3825-4db2-bdf1-108d75459131",
+    "status": 404,
+    "response": {
+      "error": "not found"
+    }
+  },
+  {
+    "section": "C120 반대 방향: Alice가 Bob 계획의 수정 이력(읽기)을 요청",
+    "url": "/api/data/plan-revisions?plan_id=9586f876-b48e-4dc5-b0b3-69c4ec973f7f",
+    "status": 404,
+    "response": {
+      "error": "not found"
+    }
+  },
+  {
+    "section": "C120 반대 방향: Alice가 Bob의 할 일 목록(읽기)을 요청",
+    "url": "/api/data/todos?plan_id=9586f876-b48e-4dc5-b0b3-69c4ec973f7f",
+    "status": 404,
+    "response": {
+      "error": "not found"
+    }
+  },
+  {
+    "section": "C120 반대 방향: Alice가 Bob의 할 일을 삭제 시도",
+    "url": "/api/data/todos?id=4c024a09-276f-4aa4-bea4-7a0368102ded",
+    "status": 404,
+    "response": {
+      "error": "not found"
+    }
+  },
+  {
+    "section": "C122 삭제 시도 이후 실제 건수 확인",
+    "bobTodoStillExists": true,
+    "aliceTodoStillExists": true
+  },
+  {
+    "section": "C123 주소(query string)에 남의 plan_id를 넣어 요청",
+    "url": "/api/data/todos?plan_id=9586f876-b48e-4dc5-b0b3-69c4ec973f7f(Alice 세션으로)",
+    "status": 404,
+    "response": {
+      "error": "not found"
+    }
+  }
+]
