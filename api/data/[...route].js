@@ -207,7 +207,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({ ok: true });
     }
 
-    return res.status(404).json({ error: 'not found' });
+    return res.status(404).json({ error: 'not found', debugRoute: route, debugMethod: req.method, debugResource: resource, debugId: id, debugSub: sub });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'server error' });
