@@ -60,7 +60,11 @@ module.exports = async (req, res) => {
       const password = req.body?.password || '';
       const reject = () => res.status(401).json({ error: '이메일 또는 비밀번호가 올바르지 않습니다.' });
       if (!email || !password) return reject();
-      const { data: user } = await db.from('users').select('*').eq('email', email).maybeSingle();
+      const { data: user, error: findErr } = await db.from('users').select('*').eq('email', email).maybeSingle();
+      if (findErr) {
+        console.error('login lookup error', findErr);
+        return res.status(500).json({ error: '로그인 처리 중 오류가 발생했습니다.', debug: findErr.message });
+      }
       const ok = await verifyPassword(password, user?.password_hash);
       if (!user || !ok) return reject();
       const session = await createSession(user.id);
