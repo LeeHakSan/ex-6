@@ -45,7 +45,10 @@ module.exports = async (req, res) => {
       }
       const password_hash = await hashPassword(password);
       const { data: user, error } = await db.from('users').insert({ email, password_hash }).select().single();
-      if (error) return res.status(500).json({ error: '가입 처리 중 오류가 발생했습니다.' });
+      if (error) {
+        console.error('signup insert error', error);
+        return res.status(500).json({ error: '가입 처리 중 오류가 발생했습니다.', debug: error.message, code: error.code });
+      }
       const session = await createSession(user.id);
       const token = signToken(session.id);
       setSessionCookie(res, token);
