@@ -47,11 +47,10 @@ module.exports = async (req, res) => {
       const { data: user, error } = await db.from('users').insert({ email, password_hash }).select().single();
       if (error) {
         console.error('signup insert error', error);
-        return res.status(500).json({ error: '가입 처리 중 오류가 발생했습니다.', debug: error.message, code: error.code });
+        return res.status(500).json({ error: '가입 처리 중 오류가 발생했습니다.' });
       }
-      const session = await createSession(user.id);
-      const token = signToken(session.id);
-      setSessionCookie(res, token);
+      // 가입 직후 자동 로그인시키지 않는다 — 가입 성공을 명확히 보여준 뒤
+      // 사용자가 직접 로그인하도록 한다(프론트에서 로그인 탭으로 전환).
       return res.status(201).json({ email: user.email });
     }
 
@@ -63,7 +62,7 @@ module.exports = async (req, res) => {
       const { data: user, error: findErr } = await db.from('users').select('*').eq('email', email).maybeSingle();
       if (findErr) {
         console.error('login lookup error', findErr);
-        return res.status(500).json({ error: '로그인 처리 중 오류가 발생했습니다.', debug: findErr.message });
+        return res.status(500).json({ error: '로그인 처리 중 오류가 발생했습니다.' });
       }
       const ok = await verifyPassword(password, user?.password_hash);
       if (!user || !ok) return reject();

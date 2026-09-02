@@ -11,6 +11,7 @@ const appRoot = document.getElementById('appRoot');
 const loginForm = document.getElementById('loginForm');
 const signupForm = document.getElementById('signupForm');
 const authError = document.getElementById('authError');
+const authSuccess = document.getElementById('authSuccess');
 const authTabLogin = document.getElementById('authTabLogin');
 const authTabSignup = document.getElementById('authTabSignup');
 const userEmailLabel = document.getElementById('userEmailLabel');
@@ -29,6 +30,11 @@ function validatePassword(pw) {
 function setAuthError(msg) {
   authError.textContent = msg || '';
   authError.hidden = !msg;
+}
+
+function setAuthSuccess(msg) {
+  authSuccess.textContent = msg || '';
+  authSuccess.hidden = !msg;
 }
 
 function showAuthScreen() {
@@ -73,11 +79,13 @@ function switchAuthTab(target) {
   loginForm.hidden = !isLogin;
   signupForm.hidden = isLogin;
   setAuthError('');
+  setAuthSuccess('');
 }
 
 async function handleLogin(e) {
   e.preventDefault();
   setAuthError('');
+  setAuthSuccess('');
   try {
     await api.login(loginForm.email.value.trim().toLowerCase(), loginForm.password.value);
     loginForm.reset();
@@ -90,6 +98,8 @@ async function handleLogin(e) {
 async function handleSignup(e) {
   e.preventDefault();
   setAuthError('');
+  setAuthSuccess('');
+  const email = signupForm.email.value.trim().toLowerCase();
   const password = signupForm.password.value;
   const password2 = signupForm.password2.value;
   if (password !== password2) {
@@ -102,9 +112,13 @@ async function handleSignup(e) {
     return;
   }
   try {
-    await api.signup(signupForm.email.value.trim().toLowerCase(), password);
+    await api.signup(email, password);
     signupForm.reset();
-    await checkSession();
+    // 가입 직후 자동 로그인시키지 않는다 — 성공 메시지를 보여주고
+    // 로그인 탭으로 돌려보내 사용자가 직접 로그인하게 한다.
+    switchAuthTab('login');
+    loginForm.email.value = email;
+    setAuthSuccess('회원가입에 성공했습니다. 로그인해 주세요.');
   } catch (err) {
     setAuthError(err.message);
   }

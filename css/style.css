@@ -99,6 +99,14 @@ body {
   border-radius: var(--radius-sm);
   font-size: 12.5px;
 }
+.auth-success {
+  margin: 14px 0 0;
+  padding: 8px 10px;
+  background: var(--ok-tint);
+  color: var(--ok);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+}
 .user-email { font-size: 12px; color: var(--text-dim); }
 
 .app-header {

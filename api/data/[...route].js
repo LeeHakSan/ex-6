@@ -25,8 +25,13 @@ module.exports = async (req, res) => {
   if (!auth) return res.status(401).json({ error: 'not authenticated' });
   const userId = auth.userId;
   const db = getDb();
-  const routeParam = req.query.route;
-  const route = Array.isArray(routeParam) ? routeParam : [routeParam].filter(Boolean);
+
+  // req.query의 동적 라우트 세그먼트 채움이 이 배포 환경에서 신뢰할 수 없어서
+  // req.url을 직접 파싱한다 (경로 세그먼트와 쿼리스트링 둘 다 여기서 구한다).
+  const parsedUrl = new URL(req.url, 'http://localhost');
+  const pathAfterData = parsedUrl.pathname.replace(/^\/api\/data\/?/, '');
+  const route = pathAfterData ? pathAfterData.split('/').filter(Boolean) : [];
+  const query = parsedUrl.searchParams;
   const [resource, id, sub] = route;
 
   try {
@@ -82,7 +87,7 @@ module.exports = async (req, res) => {
     // ---- todos ----
     if (resource === 'todos') {
       if (!id && req.method === 'GET') {
-        const planId = req.query.plan_id;
+        const planId = query.get('plan_id');
         if (!planId) return res.status(400).json({ error: 'plan_id가 필요합니다.' });
         const { data: plan } = await db.from('plans').select('id').eq('id', planId).eq('user_id', userId).maybeSingle();
         if (!plan) return res.status(404).json({ error: 'not found' });
@@ -207,7 +212,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({ ok: true });
     }
 
-    return res.status(404).json({ error: 'not found', debugRoute: route, debugMethod: req.method, debugResource: resource, debugId: id, debugSub: sub });
+    return res.status(404).json({ error: 'not found' });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'server error' });
